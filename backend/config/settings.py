@@ -10,7 +10,14 @@ dotenv.load_dotenv(BASE_DIR / ".env")
 
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 SECRET_KEY = os.getenv("SECRET_KEY", "dev-only-insecure-key-please-change-in-production")
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",") if h.strip()]
+ALLOWED_HOSTS = [
+    h.strip()
+    for h in os.getenv(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1,ecoqadamdjango.webstorm.uz,ecoqadam-production.up.railway.app",
+    ).split(",")
+    if h.strip()
+]
 
 # ------------------------------------------------------------------
 # Applications
@@ -80,7 +87,21 @@ ASGI_APPLICATION = "config.asgi.application"
 # ------------------------------------------------------------------
 # Database — PostgreSQL (SQLite optional fallback for quick local runs)
 # ------------------------------------------------------------------
-if os.getenv("DB_ENGINE", "postgres") == "sqlite":
+if os.getenv("DATABASE_URL"):
+    from urllib.parse import urlsplit
+
+    _url = urlsplit(os.getenv("DATABASE_URL"))
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": _url.path[1:],
+            "USER": _url.username,
+            "PASSWORD": _url.password,
+            "HOST": _url.hostname,
+            "PORT": _url.port or 5432,
+        }
+    }
+elif os.getenv("DB_ENGINE", "postgres") == "sqlite":
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -152,7 +173,10 @@ SPECTACULAR_SETTINGS = {
 # ------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = [
     o.strip()
-    for o in os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173").split(",")
+    for o in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,https://ecoqadam.webstorm.uz,https://ecoqadamadmin.webstorm.uz",
+    ).split(",")
     if o.strip()
 ]
 CORS_ALLOW_HEADERS = list(default_headers) + ["x-bot-token"]
