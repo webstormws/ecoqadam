@@ -15,6 +15,7 @@ import { toast } from "@/store/toastStore";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { Screen, Title, Subtitle, Button } from "@/components/ui";
 import { MiniMap } from "@/components/MiniMap";
+import { compressImage } from "@/utils/image";
 
 const WASTE_TYPES = [
   { value: "plastic", label: "Plastik", emoji: "🥤" },
@@ -45,15 +46,24 @@ export default function SubmitWaste() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
-  const pick = (file: File | null) => {
+  const pick = async (file: File | null) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
       toast.error("Faqat rasm tanlashingiz mumkin.");
       return;
     }
-    setPhotoFile(file);
-    setPhoto(URL.createObjectURL(file));
-    setStep(1);
+    if (file.size > 12 * 1024 * 1024) {
+      toast.error("Rasm juda katta (12 MB dan oshmasligi kerak). Boshqa rasm tanlang.");
+      return;
+    }
+    try {
+      const compressed = await compressImage(file);
+      setPhotoFile(compressed);
+      setPhoto(URL.createObjectURL(compressed));
+      setStep(1);
+    } catch {
+      toast.error("Rasmni o'qib bo'lmadi. Qayta urinib ko'ring.");
+    }
   };
 
   const retake = () => {
