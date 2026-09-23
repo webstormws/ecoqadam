@@ -22,7 +22,8 @@ export default function Withdraw() {
   const [error, setError] = useState("");
 
   const bal = balance.data?.balance ?? user?.balance ?? 0;
-  const canSubmit = !sending && !!amount && !!card;
+  const insufficient = bal < MIN;
+  const canSubmit = !sending && !!amount && !!card && !insufficient;
 
   const quickAmounts = [50000, 100000, 200000].filter((a) => a <= bal);
 
@@ -104,6 +105,11 @@ export default function Withdraw() {
         </div>
 
         {error && <p className="text-danger text-[13px] font-medium">{error}</p>}
+        {insufficient && (
+          <p className="text-danger text-[13px] font-medium">
+            Balansda yechib olish uchun yetarli mablag' yo'q (minimal {fmt(MIN)}).
+          </p>
+        )}
 
         <Button loading={sending} disabled={!canSubmit} onClick={submit}>
           <Send className="h-4 w-4" /> Pul yechish so'rovini yuborish
