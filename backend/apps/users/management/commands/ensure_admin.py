@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
+from apps.users.models import Profile
 from apps.users.services import normalize_phone
 
 User = get_user_model()
@@ -33,5 +34,6 @@ class Command(BaseCommand):
             user.set_password(password)
             user.first_name = name
         user.save()
+        Profile.objects.get_or_create(user=user)
         verb = "yaratildi" if created else "yangilandi"
         self.stdout.write(self.style.SUCCESS(f"Admin ({phone}) {verb}."))

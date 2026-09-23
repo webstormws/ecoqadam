@@ -77,11 +77,16 @@ class TelegramVerifyView(APIView):
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
 
+    def _profile(self, user):
+        from apps.users.models import Profile
+
+        return Profile.objects.get_or_create(user=user)[0]
+
     def get(self, request):
-        return Response(ProfileSerializer(request.user.profile, context={"request": request}).data)
+        return Response(ProfileSerializer(self._profile(request.user), context={"request": request}).data)
 
     def patch(self, request):
-        profile = request.user.profile
+        profile = self._profile(request.user)
         ser = ChangeProfileSerializer(profile, data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         ser.save()
