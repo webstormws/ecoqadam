@@ -99,6 +99,7 @@ if os.getenv("DATABASE_URL"):
             "PASSWORD": _url.password,
             "HOST": _url.hostname,
             "PORT": _url.port or 5432,
+            "OPTIONS": {"sslmode": "require"},
         }
     }
 elif os.getenv("DB_ENGINE", "postgres") == "sqlite":
