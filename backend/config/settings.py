@@ -19,6 +19,10 @@ ALLOWED_HOSTS = [
     if h.strip()
 ]
 
+# Trust the proxy (Railway / Cloudflare) so absolute URLs use https://
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
 # ------------------------------------------------------------------
 # Applications
 # ------------------------------------------------------------------
