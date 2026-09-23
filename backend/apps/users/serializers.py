@@ -44,8 +44,9 @@ class RegisterSerializer(serializers.Serializer):
     password = serializers.CharField(min_length=6, write_only=True)
 
     def validate_phone(self, value):
-        if not value.startswith("+"):
-            value = "+" + value.lstrip("0")
+        from apps.users.services import normalize_phone
+
+        value = normalize_phone(value)
         if User.objects.filter(phone=value).exists():
             raise serializers.ValidationError("Bu telefon raqam allaqachon ro'yxatdan o'tgan.")
         return value

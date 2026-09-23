@@ -15,9 +15,9 @@ class UserManager(BaseUserManager):
     def _create_user(self, phone, password, **extra_fields):
         if not phone:
             raise ValueError("Telefon raqami kiritilishi shart.")
-        phone = phone.strip()
-        if not phone.startswith("+"):
-            phone = "+" + phone.lstrip("0")
+        from apps.users.services import normalize_phone
+
+        phone = normalize_phone(phone)
         user = self.model(phone=phone, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)

@@ -6,6 +6,17 @@ from django.conf import settings
 from django.core.cache import cache
 
 
+def normalize_phone(value: str) -> str:
+    """Bo'sh joy, tire, qavs va boshqa belgilarni olib tashlab, + bilan birlashtiradi."""
+    if not value:
+        return value
+    value = str(value).strip()
+    digits = "".join(ch for ch in value if ch.isdigit())
+    if not digits:
+        return value
+    return "+" + digits.lstrip("0")
+
+
 def issue_telegram_login_token(user) -> str:
     """Short-lived token that lets the frontend exchange for JWT after a bot login."""
     token = secrets.token_urlsafe(32)

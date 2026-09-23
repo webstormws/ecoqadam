@@ -43,9 +43,9 @@ class LoginView(APIView):
     throttle_classes = [AnonRateThrottle]
 
     def post(self, request):
-        phone = request.data.get("phone", "").strip()
-        if phone and not phone.startswith("+"):
-            phone = "+" + phone.lstrip("0")
+        from apps.users.services import normalize_phone
+
+        phone = normalize_phone(request.data.get("phone", ""))
         user = authenticate(request, username=phone, password=request.data.get("password", ""))
         if user is None:
             return Response(
