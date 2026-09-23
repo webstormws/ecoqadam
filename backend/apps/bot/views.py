@@ -11,9 +11,16 @@ class HealthView(APIView):
     authentication_classes = []
 
     def get(self, request):
-        db = {"ok": True, "error": None}
+        db = {"ok": True, "error": None, "tables": []}
         try:
             connection.ensure_connection()
+            tables = set(connection.introspection.table_names())
+            db["tables"] = sorted(tables)
+            db["users_table"] = "users_user" in tables
+            if "users_user" in tables:
+                from apps.users.models import User
+
+                db["users_count"] = User.objects.count()
         except Exception as exc:  # noqa: BLE001
             db = {"ok": False, "error": str(exc)}
         return Response({"status": "ok", "database": db})
